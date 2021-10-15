@@ -65,11 +65,10 @@ function App() {
         .catch((error) => {
           alert(error);
         });
-    } else {
+    } else if (latitude === null || longitude === null) {
       getCoords();
-
-      if (latitude !== null && longitude !== null) {
-        axios
+    } else {
+      axios
         .get(
           `${URL}/weather?lat=${latitude}&lon=${longitude}&units=metric&exclude=hourly,minutely&appid=${API_KEY}`
         )
@@ -79,8 +78,6 @@ function App() {
         .catch((error) => {
           alert(error);
         });
-
-      }
     }
   };
 
@@ -89,7 +86,6 @@ function App() {
   }, [latitude, longitude]);
 
   const search = (evt) => {
-    console.log(evt)
     if (evt.key === "Enter" || evt.type === "click") {
       getWeatherInfo(query);
     }
@@ -101,12 +97,12 @@ function App() {
 
       <div>
         <Input
-          icon={<Icon name="search" className="icon" link onClick={search}/>}
+          icon={<Icon name="search" className="icon" link onClick={search} />}
           placeholder="City..."
           onChange={(e) => setQuery(e.target.value)}
           value={query}
           onKeyPress={search}
-          />
+        />
         <br />
         <br />
       </div>
