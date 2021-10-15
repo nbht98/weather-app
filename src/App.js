@@ -89,6 +89,7 @@ function App() {
   }, [latitude, longitude]);
 
   const search = (evt) => {
+    console.log(evt)
     if (evt.key === "Enter" || evt.type === "click") {
       getWeatherInfo(query);
     }
@@ -104,8 +105,8 @@ function App() {
           placeholder="City..."
           onChange={(e) => setQuery(e.target.value)}
           value={query}
-          onPress={search}
-        />
+          onKeyPress={search}
+          />
         <br />
         <br />
       </div>
