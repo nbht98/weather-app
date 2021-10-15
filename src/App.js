@@ -13,33 +13,33 @@ const URL = process.env.REACT_APP_API_URL;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 function App() {
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
-  const [city, setCity] = useState("");
-  const [temperature, setTemperature] = useState(null);
-  const [humidity, setHumidity] = useState(null);
-  const [sunrise, setSunrise] = useState(null);
-  const [sunset, setSunset] = useState(null);
-  const [icon, setIcon] = useState("");
+  const [coords, setCoords] = useState(null);
+  const [weather, setWeather] = useState(null);
   const [forecast, setForecast] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
 
   const getCoords = () => {
     navigator.geolocation.getCurrentPosition((position) => {
-      setLatitude(position.coords.latitude);
-      setLongitude(position.coords.longitude);
+      setCoords({
+        ...coords,
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
     });
   };
 
   const setWeatherState = (weatherData) => {
+    setWeather({
+      ...weather,
+      temperature: weatherData.data.main.temp,
+      sunset: weatherData.data.sys.sunset,
+      sunrise: weatherData.data.sys.sunrise,
+      humidity: weatherData.data.main.humidity,
+      city: weatherData.data.name,
+      icon: weatherData.data.weather[0].main,
+    });
     setLoading(false);
-    setTemperature(weatherData.data.main.temp);
-    setSunset(weatherData.data.sys.sunset);
-    setSunrise(weatherData.data.sys.sunrise);
-    setHumidity(weatherData.data.main.humidity);
-    setCity(weatherData.data.name);
-    setIcon(weatherData.data.weather[0].main);
 
     axios
       .get(
@@ -48,9 +48,7 @@ function App() {
       .then((weatherData) => {
         setForecast(weatherData.data.daily);
       })
-      .catch((error) => {
-        alert(error);
-      });
+      .catch((error) => {});
   };
 
   const getWeatherInfo = (cityValue) => {
@@ -62,28 +60,25 @@ function App() {
         .then((weatherData) => {
           setWeatherState(weatherData);
         })
-        .catch((error) => {
-          alert(error);
-        });
-    } else if (latitude === null || longitude === null) {
-      getCoords();
+        .catch((error) => {});
     } else {
-      axios
-        .get(
-          `${URL}/weather?lat=${latitude}&lon=${longitude}&units=metric&exclude=hourly,minutely&appid=${API_KEY}`
-        )
-        .then((weatherData) => {
-          setWeatherState(weatherData);
-        })
-        .catch((error) => {
-          alert(error);
-        });
+      getCoords();
+      if (coords !== null && weather === null) {
+        axios
+          .get(
+            `${URL}/weather?lat=${coords.latitude}&lon=${coords.longitude}&units=metric&exclude=hourly,minutely&appid=${API_KEY}`
+          )
+          .then((weatherData) => {
+            setWeatherState(weatherData);
+          })
+          .catch((error) => {});
+      }
     }
   };
 
   useEffect(() => {
     getWeatherInfo();
-  }, [latitude, longitude]);
+  }, [coords, weather]);
 
   const search = (evt) => {
     if (evt.key === "Enter" || evt.type === "click") {
@@ -112,14 +107,7 @@ function App() {
           <Loader active inline="centered" />
         </div>
       ) : (
-        <WeatherCard
-          temperature={temperature}
-          sunset={sunset}
-          sunrise={sunrise}
-          humidity={humidity}
-          city={city}
-          icon={icon}
-        />
+        <WeatherCard weather={weather} />
       )}
       <Forecast forecast={forecast} />
     </div>
