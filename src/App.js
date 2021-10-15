@@ -60,7 +60,7 @@ function App() {
         .catch((error) => {
           alert(error)
         });
-    } else if (latitude === null || longitude === null){
+    } else {
       getCoords();
 
       axios
@@ -88,7 +88,9 @@ function App() {
   };
 
   useEffect(() => {
-    getWeatherInfo();
+    if (latitude === null || longitude === null) {
+      getWeatherInfo();
+    }
   }, [latitude, longitude]);
 
   const search = (evt) => {
