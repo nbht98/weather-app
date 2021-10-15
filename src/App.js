@@ -40,15 +40,20 @@ function App() {
     setHumidity(weatherData.data.main.humidity);
     setCity(weatherData.data.name);
     setIcon(weatherData.data.weather[0].main);
-    setLatitude(weatherData.data.coord.lat);
-    setLongitude(weatherData.data.coord.lon);
+
+    axios
+      .get(
+        `${URL}/onecall?lat=${weatherData.data.coord.lat}&lon=${weatherData.data.coord.lon}&units=metric&exclude=hourly,minutely&appid=${API_KEY}`
+      )
+      .then((weatherData) => {
+        setForecast(weatherData.data.daily);
+      })
+      .catch((error) => {
+        alert(error);
+      });
   };
 
   const getWeatherInfo = (cityValue) => {
-    // if (latitude !== null && longitude !== null) {
-    //   return;
-    // }
-
     if (cityValue) {
       axios
         .get(
@@ -58,12 +63,13 @@ function App() {
           setWeatherState(weatherData);
         })
         .catch((error) => {
-          alert(error)
+          alert(error);
         });
     } else {
       getCoords();
 
-      axios
+      if (latitude !== null && longitude !== null) {
+        axios
         .get(
           `${URL}/weather?lat=${latitude}&lon=${longitude}&units=metric&exclude=hourly,minutely&appid=${API_KEY}`
         )
@@ -71,26 +77,15 @@ function App() {
           setWeatherState(weatherData);
         })
         .catch((error) => {
-          alert(error)
+          alert(error);
         });
-    }
 
-    axios
-      .get(
-        `${URL}/onecall?lat=${latitude}&lon=${longitude}&units=metric&exclude=hourly,minutely&appid=${API_KEY}`
-      )
-      .then((weatherData) => {
-        setForecast(weatherData.data.daily);
-      })
-      .catch((error) => {
-        alert(error)
-      });
+      }
+    }
   };
 
   useEffect(() => {
-    if (latitude === null || longitude === null) {
-      getWeatherInfo();
-    }
+    getWeatherInfo();
   }, [latitude, longitude]);
 
   const search = (evt) => {
@@ -105,11 +100,11 @@ function App() {
 
       <div>
         <Input
-          icon={<Icon name="search" link onClick={search} />}
+          icon={<Icon name="search" className="icon" link onClick={search}/>}
           placeholder="City..."
           onChange={(e) => setQuery(e.target.value)}
           value={query}
-          onKeyPress={search}
+          onPress={search}
         />
         <br />
         <br />
