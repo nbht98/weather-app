@@ -57,7 +57,9 @@ function App() {
         .then((weatherData) => {
           setWeatherState(weatherData);
         })
-        .catch((error) => {});
+        .catch((error) => {
+          alert(error)
+        });
     } else if (latitude === null || longitude === null){
       getCoords();
 
@@ -68,7 +70,9 @@ function App() {
         .then((weatherData) => {
           setWeatherState(weatherData);
         })
-        .catch((error) => {});
+        .catch((error) => {
+          alert(error)
+        });
     }
 
     axios
@@ -78,7 +82,9 @@ function App() {
       .then((weatherData) => {
         setForecast(weatherData.data.daily);
       })
-      .catch((error) => {});
+      .catch((error) => {
+        alert(error)
+      });
   };
 
   useEffect(() => {
